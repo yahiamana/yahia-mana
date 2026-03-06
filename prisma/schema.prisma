@@ -1,0 +1,150 @@
+// Prisma schema for portfolio application
+// Database: PostgreSQL on Neon
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+// ─── Models ───
+
+/// Admin users who can manage the portfolio content
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(EDITOR)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Two-factor authentication
+  tfaEnabled Boolean @default(false)
+  tfaSecret  String? // Encrypted TOTP secret
+
+  // Brute-force protection
+  failedLogins Int       @default(0)
+  lockedUntil  DateTime?
+
+  // Relations
+  sessions  Session[]
+  auditLogs AuditLog[]
+
+  @@index([email])
+}
+
+/// Refresh token sessions — one per device/browser
+model Session {
+  id           String   @id @default(cuid())
+  adminId      String
+  admin        AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique // Hashed refresh token for comparison
+  userAgent    String?  // Track which device created the session
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+
+  @@index([adminId])
+  @@index([refreshToken])
+}
+
+/// Portfolio projects
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  summary     String
+  contentMDX  String   // MDX content for rich project descriptions
+  featuredUrl String?  // Cloudinary public ID or URL for hero image
+  liveUrl     String?  // Live preview / demo URL
+  githubUrl   String?  // GitHub repository URL
+  gallery     Media[]
+  techTags    String[] @default([])
+  metrics     Json?    // e.g., { "conversion": "18%", "performance": "95" }
+  published   Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([published])
+}
+
+/// Media assets stored in Cloudinary
+model Media {
+  id         String   @id @default(cuid())
+  publicId   String   // Cloudinary public ID
+  url        String   // Full Cloudinary URL
+  width      Int?
+  height     Int?
+  format     String?  // e.g., "webp", "jpg", "png"
+  bytes      Int?     // File size in bytes
+  alt        String?  // Accessibility alt text
+  createdAt  DateTime @default(now())
+  uploadedBy String?  // AdminUser ID who uploaded
+
+  // Optional relation to a project gallery
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([publicId])
+  @@index([projectId])
+}
+
+/// Audit log for admin actions — immutable append-only table
+model AuditLog {
+  id        String   @id @default(cuid())
+  adminId   String
+  admin     AdminUser @relation(fields: [adminId], references: [id])
+  action    String   // e.g., "project.create", "auth.login", "media.upload"
+  target    String?  // ID of the affected resource
+  meta      Json?    // Additional context (old values, new values, IP, etc.)
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+/// Site-wide settings (singleton-ish — use first row)
+model SiteSettings {
+  id             String  @id @default("default")
+  siteTitle      String  @default("Developer Portfolio")
+  siteTagline    String  @default("Front-End Developer & Creative Technologist")
+  heroHeading    String  @default("Building the Future of the Web")
+  heroSubheading String  @default("Interactive experiences, pixel-perfect UIs, and blazing-fast performance.")
+  heroCta        String  @default("View My Work")
+  heroCtaLink    String  @default("#projects")
+  aboutText      String  @default("")
+  contactEmail   String  @default("")
+  socialGithub   String  @default("")
+  socialLinkedin String  @default("")
+  socialTwitter  String  @default("")
+  metaOgImage    String  @default("") // Cloudinary public ID for OG image
+  updatedAt      DateTime @updatedAt
+}
+
+/// Contact form submissions
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([read])
+  @@index([createdAt])
+}
