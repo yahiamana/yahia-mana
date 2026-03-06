@@ -41,16 +41,13 @@ export default function SectionReveal({ children, delay = 0, direction = "up" }:
           opacity: 1,
           y: 0,
           scale: 1,
-          duration: 1.5,
+          duration: 0.8, 
           delay: delay,
-          ease: "power2.out",
+          ease: "expo.out",
           scrollTrigger: {
             trigger: element,
-            start: "top 85%", // Trigger when top of element hits 85% of viewport
-            end: "bottom 20%",
-            toggleActions: "play reverse play reverse", // Animates out if scrolled past, back in on reverse
-            // We use scrub:false (default) for fluid transitions, 
-            // but the reverse behavior makes it feel continuously alive.
+            start: "top 90%", 
+            once: true, 
           },
         }
       );

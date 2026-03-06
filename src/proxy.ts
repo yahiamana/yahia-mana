@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * Next.js Middleware — runs on every request before the route handler.
+ * Next.js Proxy (formerly Middleware) — runs on every request before the route handler.
  * 
  * Handles:
  * 1. Admin auth check (redirect to login if no access_token cookie)
  * 2. Skip auth check for login page and public routes
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip auth check for public routes and static files

@@ -31,10 +31,10 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
     if (prefersReducedMotion) return;
 
     const lenis = new Lenis({
-      duration: 1.5, // Increased for a more buttery, premium scroll
+      duration: 0.8, // Reduced for a more responsive, snappier scroll
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       touchMultiplier: 2,
-      wheelMultiplier: 1.2, // Adds a bit more momentum to mouse wheels
+      wheelMultiplier: 1.0, // Standardized for better control
       infinite: false,
     });
 

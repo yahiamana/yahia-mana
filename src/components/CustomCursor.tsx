@@ -1,107 +1,102 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useSpring } from "framer-motion";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { motion, useSpring, useMotionValue } from "framer-motion";
 
 /**
- * CustomCursor - A premium interactive cursor that follows the mouse.
- * Includes a center dot and a trailing circle for a sophisticated feel.
+ * CustomCursor - Magnetic Aperture (V2)
+ * Features an instant precision dot and a springy interactive aperture.
+ * Solves the "slow" feeling by giving the user a direct feedback dot.
  */
 export default function CustomCursor() {
   const [isDesktop, setIsDesktop] = useState(false);
-  const cursorRef = useRef<HTMLDivElement>(null);
-  const followerRef = useRef<HTMLDivElement>(null);
+  const dotRef = useRef<HTMLDivElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
 
-  // Use springs for smooth follower motion - "Liquid" settings
-  const mouseX = useSpring(0, { stiffness: 150, damping: 20 });
-  const mouseY = useSpring(0, { stiffness: 150, damping: 20 });
+  // Aperture (Ring) springs - Fast & Responsive
+  const springConfig = { stiffness: 1000, damping: 50, mass: 0.3 };
+  const ringX = useSpring(0, springConfig);
+  const ringY = useSpring(0, springConfig);
+  
+  // Size and scale for snapping
+  const apertureSize = useMotionValue(20);
+  const apertureOpacity = useMotionValue(1);
+
+  const updatePosition = useCallback((e: MouseEvent) => {
+    const { clientX, clientY } = e;
+    
+    // Instant tracking for the dot
+    if (dotRef.current) {
+      dotRef.current.style.transform = `translate3d(${clientX}px, ${clientY}px, 0)`;
+    }
+
+    // Spring tracking for the ring (only if not hovering/snapped)
+    if (!isHovering) {
+      ringX.set(clientX);
+      ringY.set(clientY);
+    }
+  }, [isHovering, ringX, ringY]);
 
   useEffect(() => {
-    // Only enable on desktop/pointer devices
     const checkViewport = () => {
       setIsDesktop(window.matchMedia("(pointer: fine)").matches);
     };
     
     checkViewport();
     window.addEventListener("resize", checkViewport);
+    window.addEventListener("mousemove", updatePosition);
 
-    const onMouseMove = (e: MouseEvent) => {
-      if (cursorRef.current && followerRef.current) {
-        const { clientX, clientY } = e;
+    const handleInteraction = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const interactive = target.closest('a, button, .interactive');
+      
+      if (interactive) {
+        const rect = interactive.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
         
-        // Main cursor (instant)
-        cursorRef.current.style.transform = `translate3d(${clientX}px, ${clientY}px, 0) translate(-50%, -50%)`;
-        
-        // Follower (using springs via framer motion is better, but let's stick to refs for perf if needed)
-        // Actually, let's use the motion values for the follower for that "lazy" feel
-        mouseX.set(clientX);
-        mouseY.set(clientY);
+        setIsHovering(true);
+        ringX.set(centerX);
+        ringY.set(centerY);
+        apertureSize.set(Math.max(rect.width, rect.height) + 15);
+        apertureOpacity.set(0.3);
+      } else {
+        setIsHovering(false);
+        apertureSize.set(20);
+        apertureOpacity.set(1);
       }
     };
 
-    const onMouseEnter = () => {
-      if (cursorRef.current) cursorRef.current.style.scale = "1";
-    };
-
-    const onMouseLeave = () => {
-      if (cursorRef.current) cursorRef.current.style.scale = "0";
-    };
-
-    // Global listeners
-    window.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseenter", onMouseEnter);
-    document.addEventListener("mouseleave", onMouseLeave);
-
-    // Interaction states
-    const interactiveElements = document.querySelectorAll('a, button, .interactive');
-    
-    const onHoverStart = () => {
-      if (cursorRef.current) cursorRef.current.style.scale = "2.5";
-      if (followerRef.current) followerRef.current.style.scale = "0.5";
-    };
-
-    const onHoverEnd = () => {
-      if (cursorRef.current) cursorRef.current.style.scale = "1";
-      if (followerRef.current) followerRef.current.style.scale = "1";
-    };
-
-    interactiveElements.forEach(el => {
-      el.addEventListener("mouseenter", onHoverStart);
-      el.addEventListener("mouseleave", onHoverEnd);
-    });
+    window.addEventListener("mouseover", handleInteraction);
 
     return () => {
       window.removeEventListener("resize", checkViewport);
-      window.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseenter", onMouseEnter);
-      document.removeEventListener("mouseleave", onMouseLeave);
-      interactiveElements.forEach(el => {
-        el.removeEventListener("mouseenter", onHoverStart);
-        el.removeEventListener("mouseleave", onHoverEnd);
-      });
+      window.removeEventListener("mousemove", updatePosition);
+      window.removeEventListener("mouseover", handleInteraction);
     };
-  }, [mouseX, mouseY]);
+  }, [ringX, ringY, apertureSize, apertureOpacity, updatePosition]);
 
   if (!isDesktop) return null;
 
   return (
     <>
-      {/* Main Cursor Dot */}
+      {/* Precision Dot - Instant Transformation */}
       <div 
-        ref={cursorRef} 
-        className="custom-cursor" 
-        style={{ scale: 0 }} 
+        ref={dotRef}
+        className="fixed top-0 left-0 w-1 h-1 bg-white rounded-full z-[10000] pointer-events-none mix-blend-difference -translate-x-1/2 -translate-y-1/2 will-change-transform"
       />
-      
-      {/* Follower Circle */}
+
+      {/* Magnetic Aperture - Spring Transformation */}
       <motion.div
-        ref={followerRef}
-        className="custom-cursor-follower"
+        className="custom-cursor"
         style={{
-          x: mouseX,
-          y: mouseY,
+          x: ringX,
+          y: ringY,
           translateX: "-50%",
           translateY: "-50%",
+          width: apertureSize,
+          height: apertureSize,
+          opacity: apertureOpacity,
         }}
       />
     </>

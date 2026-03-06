@@ -256,9 +256,9 @@ html.lenis body {
   background: var(--color-text-muted);
 }
 
-/* ─── Custom Cursor ─── */
+/* ─── Custom Cursor (Magnetic Aperture) ─── */
 @media (pointer: fine) {
-  body, a, button, [role="button"] {
+  body, a, button, [role="button"], .interactive {
     cursor: none !important;
   }
 }
@@ -267,31 +267,18 @@ html.lenis body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 8px;
-  height: 8px;
-  background-color: var(--color-accent);
+  width: var(--cursor-size, 20px);
+  height: var(--cursor-size, 20px);
+  border: 1.5px solid white;
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
-  transition: scale 0.3s ease, background-color 0.3s ease;
   mix-blend-mode: difference;
-  transform: translate(-50%, -50%);
-}
-
-.custom-cursor-follower {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 40px;
-  height: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(2px);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-  transition: scale 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
-  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.3s var(--ease-out-expo), height 0.3s var(--ease-out-expo), border-color 0.3s ease;
+  will-change: transform, width, height;
 }
 
 /* ─── Marquee Animations ─── */
