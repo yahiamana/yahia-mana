@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/rbac";
 import { createProjectSchema } from "@/lib/validation";
 import { createAuditLog } from "@/lib/audit";
 import { validateCsrf } from "@/lib/csrf";
+import { revalidatePath } from "next/cache";
 import type { JWTPayload } from "@/types";
 
 /**
@@ -98,6 +99,10 @@ export async function POST(request: Request) {
       target: project.id,
       meta: { title: project.title, slug: project.slug },
     });
+    
+    // Revalidate public pages
+    revalidatePath("/");
+    revalidatePath("/projects");
 
     return NextResponse.json({ success: true, data: project }, { status: 201 });
   } catch (error) {

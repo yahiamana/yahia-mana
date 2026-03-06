@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/rbac";
 import { updateProjectSchema } from "@/lib/validation";
 import { createAuditLog } from "@/lib/audit";
 import { validateCsrf } from "@/lib/csrf";
+import { revalidatePath } from "next/cache";
 import type { JWTPayload } from "@/types";
 
 /**
@@ -121,6 +122,11 @@ export async function PUT(
       target: id,
       meta: { changes: Object.keys(parsed.data) },
     });
+    
+    // Revalidate public pages
+    revalidatePath("/");
+    revalidatePath("/projects");
+    revalidatePath(`/projects/${updated.slug}`);
 
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
@@ -155,6 +161,11 @@ export async function DELETE(
     }
 
     await prisma.project.delete({ where: { id } });
+
+    // Revalidate public pages
+    revalidatePath("/");
+    revalidatePath("/projects");
+    revalidatePath(`/projects/${existing.slug}`);
 
     await createAuditLog({
       adminId: (user as JWTPayload).sub,
