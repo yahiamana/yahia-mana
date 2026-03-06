@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Developer Portfolio
 
-## Getting Started
+Full-stack portfolio built with Next.js 16, Three.js, GSAP, Lenis, Framer Motion, Prisma, PostgreSQL (Neon), and Cloudinary.
 
-First, run the development server:
+## Quick Start
 
 ```bash
+# 1. Clone and install
+git clone <repo-url>
+cd prtf
+npm install
+
+# 2. Set up environment
+cp .env.example .env
+# Edit .env with your Neon DB URL, Cloudinary credentials, JWT secret, etc.
+
+# 3. Generate Prisma client & run migrations
+npx prisma generate
+npx prisma migrate dev
+
+# 4. Seed the database
+SEED_ADMIN_PASSWORD=your-strong-password-here npm run seed
+
+# 5. Start dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) — portfolio
+Open [http://localhost:3000/admin/login](http://localhost:3000/admin/login) — admin panel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | TypeScript type checking |
+| `npm run test` | Run unit tests (Vitest) |
+| `npm run test:e2e` | Run E2E tests (Playwright) |
+| `npm run seed` | Seed database with admin + sample data |
+| `npm run prisma:migrate` | Run Prisma migrations |
+| `npm run prisma:generate` | Generate Prisma client |
 
-## Learn More
+## Architecture
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/          # Next.js App Router pages & API routes
+  components/   # React components (HeroCanvas, Header, etc.)
+  lib/          # Server utilities (auth, prisma, cloudinary)
+  types/        # Shared TypeScript types
+  styles/       # Global CSS
+prisma/         # Schema & migrations
+scripts/        # Seed script
+tests/          # Unit, integration, E2E tests
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+See [`.env.example`](.env.example) for all required variables:
+- `DATABASE_URL` — Neon PostgreSQL connection string
+- `JWT_SECRET` — 64-char hex for JWT signing
+- `CLOUDINARY_*` — Cloudinary credentials
+- `SMTP_*` — Email service for contact notifications
+- `SENTRY_DSN` — Error monitoring
 
-## Deploy on Vercel
+## Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Framework**: Next.js 16 (App Router, React 19)
+- **3D**: Three.js (procedural geometry, no external assets)
+- **Animation**: GSAP + ScrollTrigger, Lenis smooth scroll, Framer Motion
+- **Database**: PostgreSQL on Neon, Prisma ORM
+- **Media**: Cloudinary (signed uploads, responsive transforms)
+- **Auth**: bcrypt hashing, JWT (jose), refresh token rotation, optional TOTP 2FA
+- **Validation**: Zod
+- **Testing**: Vitest, Playwright
+- **Deployment**: Vercel
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Security
+
+See [SECURITY.md](SECURITY.md) for the full security checklist.
+
+Key security features:
+- HttpOnly, Secure, SameSite=Strict cookies
+- Refresh token rotation with DB-backed sessions
+- Account lockout after 5 failed attempts
+- CSRF double-submit cookie pattern
+- Rate limiting on auth and upload endpoints
+- CSP, HSTS, X-Frame-Options headers
+- RBAC with ADMIN/EDITOR roles
+- Audit logging for all admin actions
+
+## Deployment
+
+1. Create a **Neon** database → copy `DATABASE_URL`
+2. Create **Cloudinary** account → copy cloud name, API key, secret
+3. Deploy to **Vercel** → set all env vars from `.env.example`
+4. Run `npx prisma migrate deploy` on Vercel
+5. Seed the database with your admin password
+6. Enable 2FA on your admin account for production
+
+## License
+
+Private — All rights reserved.
