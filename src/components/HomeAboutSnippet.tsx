@@ -16,8 +16,8 @@ export default function HomeAboutSnippet() {
         <div 
           style={{ 
             display: "grid", 
-            gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", 
-            gap: "3rem",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))", 
+            gap: "clamp(2rem, 5vw, 4rem)",
             alignItems: "center"
           }}
         >
@@ -26,8 +26,9 @@ export default function HomeAboutSnippet() {
             <div style={{ position: "relative" }}>
               <GlassCard className="p-2 overflow-hidden" style={{ borderRadius: "24px", perspective: "1000px" }}>
                 <div 
+                  className="profile-card-content"
                   style={{ 
-                    height: "450px", 
+                    minHeight: "450px", 
                     width: "100%", 
                     background: "linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-elevated))",
                     borderRadius: "18px",
@@ -36,7 +37,7 @@ export default function HomeAboutSnippet() {
                     alignItems: "center",
                     justifyContent: "center",
                     textAlign: "center",
-                    padding: "2rem",
+                    padding: "2.5rem 2rem",
                     gap: "1.5rem",
                     border: "1px solid var(--glass-border)",
                   }}

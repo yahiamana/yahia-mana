@@ -214,51 +214,81 @@ export default function Header({ siteTitle = "Mana Yahia" }: { siteTitle?: strin
       </nav>
 
       {/* Mobile Menu Panel */}
+      <motion.div
+        initial={{ opacity: 0, x: "100%" }}
+        animate={{ opacity: isMobileMenuOpen ? 1 : 0, x: isMobileMenuOpen ? 0 : "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          width: "280px",
+          height: "100vh",
+          background: "var(--glass-bg)",
+          backdropFilter: "blur(32px)",
+          borderLeft: "1px solid var(--glass-border)",
+          padding: "5rem 2rem",
+          zIndex: 90,
+          display: isMobileMenuOpen ? "block" : "none",
+          boxShadow: "-10px 0 30px rgba(0,0,0,0.1)",
+        }}
+      >
+        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {navLinks.map((link, i) => (
+            <motion.li 
+              key={link.href}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: isMobileMenuOpen ? 1 : 0, x: isMobileMenuOpen ? 0 : 20 }}
+              transition={{ delay: i * 0.05 + 0.2 }}
+            >
+              <Link
+                href={link.href}
+                style={{
+                  display: "block",
+                  padding: "1rem 0",
+                  textDecoration: "none",
+                  color: pathname === link.href ? "var(--color-accent)" : "var(--color-text-primary)",
+                  fontSize: "1.125rem",
+                  fontWeight: 600,
+                  borderBottom: "1px solid var(--glass-border)",
+                  transition: "color 0.3s ease",
+                }}
+              >
+                {link.label}
+              </Link>
+            </motion.li>
+          ))}
+        </ul>
+
+        <div style={{ marginTop: "auto", paddingTop: "2rem" }}>
+          <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+            Connect
+          </p>
+          <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+            {/* Social icons placeholder/shortcuts */}
+            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "var(--color-border)" }} />
+            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "var(--color-border)" }} />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Overlay for mobile menu */}
       {isMobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
+        <div 
+          onClick={() => setIsMobileMenuOpen(false)}
           style={{
-            position: "absolute",
-            top: "72px",
-            left: 0,
-            right: 0,
-            background: "var(--color-bg)",
-            backdropFilter: "blur(20px)",
-            borderBottom: "1px solid var(--glass-border)",
-            padding: "1rem var(--container-padding)",
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.2)",
+            zIndex: 89,
+            backdropFilter: "blur(4px)",
           }}
-        >
-          <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-            {navLinks.map((link) => (
-              <li key={link.href} style={{ marginBottom: "0.5rem" }}>
-                <Link
-                  href={link.href}
-                  style={{
-                    display: "block",
-                    padding: "0.75rem 0",
-                    textDecoration: "none",
-                    color:
-                      pathname === link.href
-                        ? "var(--color-accent)"
-                        : "var(--color-text-secondary)",
-                    fontSize: "1rem",
-                    fontWeight: 500,
-                    borderBottom: "1px solid var(--color-border)",
-                  }}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </motion.div>
+        />
       )}
 
       {/* Responsive styles */}
       <style jsx global>{`
-        @media (max-width: 768px) {
+        @media (max-width: 860px) {
           .desktop-nav {
             display: none !important;
           }

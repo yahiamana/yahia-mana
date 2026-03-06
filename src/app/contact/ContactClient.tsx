@@ -89,7 +89,14 @@ export default function ContactClient() {
 
   return (
     <div style={{ maxWidth: "700px", margin: "0 auto" }}>
-      <GlassCard style={{ padding: "3rem", borderRadius: "32px", border: "1px solid rgba(255,255,255,0.05)" }}>
+      <GlassCard 
+        className="contact-form-card"
+        style={{ 
+          padding: "clamp(1.5rem, 5vw, 3rem)", 
+          borderRadius: "32px", 
+          border: "1px solid rgba(255,255,255,0.05)" 
+        }}
+      >
         <form onSubmit={handleSubmit}>
           
           <FormInput id="name" label="Full Name" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
@@ -137,8 +144,16 @@ export default function ContactClient() {
         </form>
       </GlassCard>
 
-      {/* Social Shortcut Grid */}
-      <div style={{ display: "flex", justifyContent: "center", gap: "2.5rem", marginTop: "3rem" }}>
+      {/* Social Shortcut Grid - Responsive stacking */}
+      <div 
+        style={{ 
+          display: "grid", 
+          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+          justifyContent: "center", 
+          gap: "1.5rem", 
+          marginTop: "3rem" 
+        }}
+      >
         {[
           { 
             platform: "Email", 

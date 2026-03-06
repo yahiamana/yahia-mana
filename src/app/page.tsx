@@ -92,7 +92,7 @@ export default async function HomePage() {
             <h1
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(3.5rem, 8vw, 6rem)",
+                fontSize: "clamp(2.5rem, 8vw, 6rem)",
                 fontWeight: 700,
                 lineHeight: 1.05,
                 letterSpacing: "-0.02em",
@@ -104,11 +104,11 @@ export default async function HomePage() {
               </span>
             </h1>
           </SectionReveal>
-
+          
           <SectionReveal delay={0.4} direction="up">
             <p
               style={{
-                fontSize: "clamp(1.125rem, 2.5vw, 1.625rem)",
+                fontSize: "clamp(1rem, 2.5vw, 1.625rem)",
                 color: "var(--color-text-secondary)",
                 maxWidth: "650px",
                 margin: "0 auto 3rem",
