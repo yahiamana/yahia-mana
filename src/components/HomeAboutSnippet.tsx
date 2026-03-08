@@ -63,11 +63,11 @@ export default function HomeAboutSnippet() {
                   
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", width: "100%", marginTop: "auto" }}>
                     <div className="glass p-4" style={{ borderRadius: "12px" }}>
-                      <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--color-text-primary)" }}>3+</div>
+                      <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--color-text-primary)" }}>6+</div>
                       <div style={{ fontSize: "0.7rem", color: "var(--color-text-muted)", textTransform: "uppercase" }}>Years Exp.</div>
                     </div>
                     <div className="glass p-4" style={{ borderRadius: "12px" }}>
-                      <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--color-text-primary)" }}>10+</div>
+                      <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--color-text-primary)" }}>50+</div>
                       <div style={{ fontSize: "0.7rem", color: "var(--color-text-muted)", textTransform: "uppercase" }}>Projects</div>
                     </div>
                   </div>
